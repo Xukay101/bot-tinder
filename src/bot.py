@@ -1,9 +1,9 @@
 from time import sleep
 
 import undetected_chromedriver as uc
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 from config import settings
@@ -16,14 +16,17 @@ class TinderBot:
 
     def start(self):
         self.driver.get(self.tinder_url)
+        self.allow_location()
         self.login()
+
+        sleep(20)
 
     def login(self):
         tinder_login_button = self.driver.find_element(By.XPATH, settings.XPATH_TINDER_LOGIN_BUTTON)
         tinder_login_button.click()
 
-        WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.XPATH, settings.XPATH_GOOGLE_LOGIN_BUTTON)))
-        google_login_button = self.driver.find_element(By.XPATH, settings.XPATH_GOOGLE_LOGIN_BUTTON)
+        
+        google_login_button = WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.XPATH, settings.XPATH_GOOGLE_LOGIN_BUTTON)))
         google_login_button.click()
 
         # Handle google login window
@@ -43,8 +46,25 @@ class TinderBot:
         password_input.send_keys(settings.GOOGLE_PASSWORD)
         password_input.send_keys(Keys.ENTER)
 
-        sleep(2)
-
         self.driver.switch_to.window(main_page)
+
         
-        sleep(10)
+    def allow_location(self):
+        self.driver.execute_cdp_cmd(
+            "Browser.grantPermissions",
+            {
+                "origin": self.tinder_url,
+                "permissions": ["geolocation"],
+            },
+        )
+        self.driver.execute_cdp_cmd(
+            "Emulation.setGeolocationOverride",
+            {
+                "latitude": -34.603722,
+                "longitude": -58.381592,
+                "accuracy": 100,
+            },
+        )
+
+    def close(self):
+        self.driver.quit()

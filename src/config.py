@@ -14,11 +14,15 @@ class Settings(BaseSettings):
     GOOGLE_EMAIL: str
     GOOGLE_PASSWORD: str
 
+    # Location
+    LATITUDE: float = -34.603722
+    LONGITUDE: float = -58.381592
+
     # XPath configurations
     XPATH_TINDER_LOGIN_BUTTON: str = '//*[@id="q488047873"]/div/div[1]/div/main/div[1]/div/div/div/div/header/div/div[2]/div[2]/a'
     XPATH_GOOGLE_LOGIN_BUTTON: str = '//*[@id="q1569882032"]'
     XPATH_GOOGLE_EMAIL_INPUT: str = '//*[@id="identifierId"]'
     XPATH_GOOGLE_PASSWORD_INPUT: str = '//*[@id="password"]/div[1]/div/div[1]/input'
-    
+    XPATH_TINDER_ALLOW_LOCATION_BUTTON: str = '//*[@id="q-1240333203"]/main/div/div/div/div[3]/button[1]/div[2]/div[2]'
 
 settings = Settings()
