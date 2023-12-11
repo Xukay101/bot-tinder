@@ -32,7 +32,4 @@ class Settings(BaseSettings):
     XPATH_TINDER_MATH_CONTAINER: str = ''
     XPATH_TINDER_MATH_IGNORE_BUTTON: str = ''
 
-
-    
-
 settings = Settings()
