@@ -1,5 +1,5 @@
 from time import sleep
-from random import random
+from random import random, randint
 
 import undetected_chromedriver as uc
 from selenium.webdriver.support import expected_conditions as EC
@@ -30,7 +30,6 @@ class TinderBot:
             return WebDriverWait(driver, timeout).until(EC.presence_of_element_located((by, locator)))
         except TimeoutException:
             raise Exception(f'Element not found: {locator}')
-
 
     def login(self):
         tinder_login_button = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_TINDER_LOGIN_BUTTON)
@@ -66,48 +65,32 @@ class TinderBot:
                 "permissions": ["geolocation"],
             },
         )
-        self.driver.execute_cdp_cmd(
-            "Emulation.setGeolocationOverride",
-            {
-                "latitude": settings.LATITUDE,
-                "longitude": settings.LONGITUDE,
-                "accuracy": 100,
-            },
-        )
 
     def give_likes(self):
-        html_element = self.driver.find_element(By.TAG_NAME, 'html')
         while True:
             # Browse photos
             self.browse_photos()
-            sleep(1)
 
             # Probability of like
             if random() < settings.LIKE_PROBABILITY:
-                # like_button = self.driver.find_element(By.XPATH, settings.XPATH_TINDER_LIKE_BUTTON)
-                # like_button.click()
-                html_element.send_keys(Keys.ARROW_RIGHT)
+                # Like
+                self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_RIGHT)
 
                 # Ignore if matching
                 # if self.is_math():
                 #     ignore_button = self.driver.find_element(By.XPATH, settings.XPATH_TINDER_MATH_IGNORE_BUTTON)
             else:
-                # deny_button = self.driver.find_element(By.XPATH, settings.XPATH_TINDER_DENY_BUTTON)
-                # deny_button.click()
-                html_element.send_keys(Keys.ARROW_LEFT)
-
+                # Dislike
+                self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_LEFT)
 
     def browse_photos(self):
         photos_container = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_TINDER_PHOTOS_CONTAINER)
-        # REFACTORIZAR
-        html_element = self.driver.find_element(By.TAG_NAME, 'html')
-        for _ in range(6):
-            html_element.send_keys(Keys.SPACE)
-            sleep(1)
+        sleep(1) # [Important] Wait for all the photos to load
+        number_of_photos = len(photos_container.find_elements(By.TAG_NAME, 'span'))
 
-        # next_photo_button = self.driver.find_element(By.XPATH, settings.XPATH_TINDER_NEXT_PHOTO_BUTTON)
-        # for _ in range(len(photos_elements)-1):
-        #     next_photo_button.click()
+        for _ in range(randint(1, number_of_photos-1)):
+            self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.SPACE)
+            sleep(0.5)
 
     def is_math(self):
         try:
