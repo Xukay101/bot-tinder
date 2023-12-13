@@ -22,14 +22,20 @@ class TinderBot:
         self.login()
         self.give_likes()
 
-        sleep(100)
-
     @staticmethod
     def wait_for_element(driver, by, locator, timeout=10):
         try:
             return WebDriverWait(driver, timeout).until(EC.presence_of_element_located((by, locator)))
         except TimeoutException:
             raise Exception(f'Element not found: {locator}')
+
+    @staticmethod
+    def is_element_present(driver, by, locator, timeout=0):
+        try:
+            WebDriverWait(driver, timeout).until(EC.presence_of_element_located((by, locator)))
+            return True
+        except TimeoutException:
+            return False
 
     def login(self):
         tinder_login_button = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_TINDER_LOGIN_BUTTON)
@@ -56,7 +62,8 @@ class TinderBot:
         password_input.send_keys(Keys.ENTER)
 
         self.driver.switch_to.window(main_page)
-        
+        sleep(10) # [Important] These 10 seconds are to load the main tinder page
+                
     def allow_location(self):
         self.driver.execute_cdp_cmd(
             "Browser.grantPermissions",
@@ -65,9 +72,20 @@ class TinderBot:
                 "permissions": ["geolocation"],
             },
         )
+        self.driver.execute_cdp_cmd(
+            "Emulation.setGeolocationOverride",
+            {
+                "latitude": settings.LATITUDE,
+                "longitude": settings.LONGITUDE,
+                "accuracy": 100,
+            },
+        )
 
     def give_likes(self):
         while True:
+            # Check if any modal is present
+            self.is_modal_present()
+
             # Browse photos
             self.browse_photos()
 
@@ -83,6 +101,20 @@ class TinderBot:
                 # Dislike
                 self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_LEFT)
 
+    def is_modal_present(self):
+        modal_xpaths = [
+            settings.XPATH_TINDER_IGNORE_ADD_TO_DESKTOP_BUTTON,
+            settings.XPATH_TINDER_IGNORE_BUY_PREMIUM_BUTTON,
+            settings.XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON,
+        ]
+
+        sleep(0.5)
+        for xpath in modal_xpaths:
+            if self.is_element_present(self.driver, By.XPATH, xpath):
+                element_button = self.driver.find_element(By.XPATH, xpath)
+                element_button.click()
+                break
+
     def browse_photos(self):
         photos_container = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_TINDER_PHOTOS_CONTAINER)
         sleep(1) # [Important] Wait for all the photos to load
@@ -92,12 +124,5 @@ class TinderBot:
             self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.SPACE)
             sleep(0.5)
 
-    def is_math(self):
-        try:
-            math_element = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_TINDER_MATH_CONTAINER)
-            return True
-        except:
-            return False
-        
     def close(self):
         self.driver.quit()
