@@ -1,4 +1,6 @@
+import threading
 from time import sleep
+from datetime import datetime, timedelta
 from random import random, randint
 
 import undetected_chromedriver as uc
@@ -16,10 +18,16 @@ class TinderBot:
         self.driver = uc.Chrome(use_subprocess=True)
         self.tinder_url = settings.TINDER_URL
 
+        self.in_hibernation = True
+        # self.inactivity_duration = timedelta(hours=12)
+        self.last_likes_activity_time = datetime.now()
+        self.check_thread = threading.Thread(target=self.periodic_checks, daemon=True) # separate thread
+
     def start(self):
         self.driver.get(self.tinder_url)
         self.allow_location()
         self.login()
+        self.check_thread.start()
         self.give_likes()
 
     @staticmethod
@@ -36,6 +44,14 @@ class TinderBot:
             return True
         except TimeoutException:
             return False
+
+    def periodic_checks(self):
+        # Check logic every 15 minutes
+        while True:
+            if self.in_hibernation:
+                print('Performing periodic checks...')
+
+            sleep(2)
 
     def login(self):
         tinder_login_button = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_TINDER_LOGIN_BUTTON)
