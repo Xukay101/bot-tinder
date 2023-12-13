@@ -88,10 +88,16 @@ class TinderBot:
         while True:
             # Check if any modal is present
             self.is_modal_present()
-            if self.in_hibernation:
-                sleep(43220) # 12hours = 43200segs
-                self.in_hibernation = False
 
+            # Check hibernation
+            if self.in_hibernation:
+                print('Retrying 12 hours')
+                sleep(10) # 43220 = 12hours 20segs
+                while self.is_out_of_likes_modal_present():
+                    print('Retrying 15 minutes')
+                    sleep(5) # 900 = 15mins
+                self.in_hibernation = False
+                
             # Browse photos
             self.browse_photos()
 
@@ -124,6 +130,17 @@ class TinderBot:
                 element_button = self.driver.find_element(By.XPATH, xpath)
                 element_button.click()
                 break
+
+    def is_out_of_likes_modal_present(self):
+        xpath = settings.XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON
+        self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_RIGHT)
+
+        sleep(0.5)
+        if self.is_element_present(self.driver, By.XPATH, xpath):
+            element_button = self.driver.find_element(By.XPATH, xpath)
+            element_button.click()
+            return True
+        return False
 
     def browse_photos(self):
         photos_container = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_TINDER_PHOTOS_CONTAINER)
