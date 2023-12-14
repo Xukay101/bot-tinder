@@ -26,8 +26,7 @@ class Settings(BaseSettings):
     XPATH_TINDER_LOGIN_BUTTON: str = '//*[@id="o2120851872"]/div/div[1]/div/main/div[1]/div/div/div/div/header/div/div[2]/div[2]/a'
     XPATH_TINDER_ALLOW_LOCATION_BUTTON: str = '//*[@id="q-1240333203"]/main/div/div/div/div[3]/button[1]/div[2]/div[2]'
     XPATH_TINDER_PHOTOS_CONTAINER: str = '//*[@id="o2120851872"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[1]/div[1]'
-    XPATH_TINDER_MATH_CONTAINER: str = ''
-    XPATH_TINDER_MATH_IGNORE_BUTTON: str = ''
+    XPATH_TINDER_IGNORE_MATCH_BUTTON: str = '//*[@id="o-1843744223"]/main/div/div[1]/div/div[4]/button'
     # XPATH_TINDER_NEXT_PHOTO_BUTTON: str = '' # Unused
     # XPATH_TINDER_LIKE_BUTTON: str = '' # Unused
     # XPATH_TINDER_DENY_BUTTON: str = '' # Unused

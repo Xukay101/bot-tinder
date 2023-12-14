@@ -105,10 +105,6 @@ class TinderBot:
             if random() < settings.LIKE_PROBABILITY:
                 # Like
                 self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_RIGHT)
-
-                # Ignore if matching
-                # if self.is_math():
-                #     ignore_button = self.driver.find_element(By.XPATH, settings.XPATH_TINDER_MATH_IGNORE_BUTTON)
             else:
                 # Dislike
                 self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_LEFT)
@@ -118,10 +114,11 @@ class TinderBot:
             settings.XPATH_TINDER_IGNORE_ADD_TO_DESKTOP_BUTTON,
             settings.XPATH_TINDER_IGNORE_BUY_PREMIUM_BUTTON,
             settings.XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON,
+            settings.XPATH_TINDER_IGNORE_MATCH_BUTTON,
         ]
 
-        sleep(0.5)
         for xpath in modal_xpaths:
+            sleep(0.15)
             if self.is_element_present(self.driver, By.XPATH, xpath):
                 if xpath == settings.XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON:
                     print("Detected limited likes modal. Entering hibernation...")
@@ -129,13 +126,12 @@ class TinderBot:
 
                 element_button = self.driver.find_element(By.XPATH, xpath)
                 element_button.click()
-                break
 
     def is_out_of_likes_modal_present(self):
         xpath = settings.XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON
         self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_RIGHT)
 
-        sleep(0.5)
+        sleep(0.2)
         if self.is_element_present(self.driver, By.XPATH, xpath):
             element_button = self.driver.find_element(By.XPATH, xpath)
             element_button.click()
