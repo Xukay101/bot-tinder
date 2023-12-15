@@ -1,3 +1,4 @@
+import logging, sys
 from time import sleep
 from datetime import datetime, timedelta
 from random import random, randint
@@ -10,11 +11,17 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
 
 from config import settings
+from logger_config import configure_logging
+
+configure_logging()
 
 class TinderBot:
 
     def __init__(self): 
-        self.driver = uc.Chrome(use_subprocess=True)
+        options = uc.ChromeOptions()
+        if settings.HEADLESS: options.add_argument('--headless')
+
+        self.driver = uc.Chrome(use_subprocess=True, options=options)
         self.tinder_url = settings.TINDER_URL
 
         self.in_hibernation = False
@@ -23,7 +30,11 @@ class TinderBot:
         self.driver.get(self.tinder_url)
         self.allow_location()
         self.login()
-        self.give_likes()
+
+        if settings.TEST_MODE:
+            sleep(3000)
+        else:
+            self.give_likes()
 
     @staticmethod
     def wait_for_element(driver, by, locator, timeout=10):
@@ -41,31 +52,46 @@ class TinderBot:
             return False
 
     def login(self):
-        tinder_login_button = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_TINDER_LOGIN_BUTTON)
-        tinder_login_button.click()
+        try:
+            logging.info("Logging into Tinder...")
 
-        google_login_button = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_GOOGLE_LOGIN_BUTTON)
-        google_login_button.click()
+            tinder_login_button = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_TINDER_LOGIN_BUTTON)
+            tinder_login_button.click()
+            logging.info("Clicked Tinder login button")
 
-        # Handle google login window
-        main_page = self.driver.current_window_handle 
-        for handle in self.driver.window_handles: 
-            self.driver.switch_to.window(handle)
-            if 'sign in' in self.driver.title.lower():
-                login_page = handle
-                break
+            google_login_button = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_GOOGLE_LOGIN_BUTTON)
+            google_login_button.click()
+            logging.info("Clicked Google login button")
 
-        # Enter data in inputs
-        email_input = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_GOOGLE_EMAIL_INPUT)
-        email_input.send_keys(settings.GOOGLE_EMAIL)
-        email_input.send_keys(Keys.ENTER)
+            # Handle google login window
+            sleep(3)
+            main_page = self.driver.current_window_handle 
+            for handle in self.driver.window_handles: 
+                self.driver.switch_to.window(handle)
+                if 'sign in' in self.driver.title.lower():
+                    login_page = handle
+                    break
+            else:
+                raise Exception("Google login window not found")
 
-        password_input = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_GOOGLE_PASSWORD_INPUT)
-        password_input.send_keys(settings.GOOGLE_PASSWORD)
-        password_input.send_keys(Keys.ENTER)
+            # Enter data in inputs
+            email_input = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_GOOGLE_EMAIL_INPUT)
+            email_input.send_keys(settings.GOOGLE_EMAIL)
+            email_input.send_keys(Keys.ENTER)
+            logging.info("Entered Google email")
 
-        self.driver.switch_to.window(main_page)
-        sleep(10) # [Important] These 10 seconds are to load the main tinder page
+            password_input = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_GOOGLE_PASSWORD_INPUT)
+            password_input.send_keys(settings.GOOGLE_PASSWORD)
+            password_input.send_keys(Keys.ENTER)
+            logging.info("Entered Google password")
+
+            sleep(10)
+            self.driver.switch_to.window(main_page)
+            sleep(20) # [Important] These seconds are to load the main tinder page
+
+        except Exception as e:
+            logging.error(f"Error during login: {str(e)}")
+            self.close()
                 
     def allow_location(self):
         self.driver.execute_cdp_cmd(
@@ -85,35 +111,42 @@ class TinderBot:
         )
 
     def give_likes(self):
-        while True:
-            # Check if any modal is present
-            self.is_modal_present()
+        logging.info('Starting to given like')
+        try:
+            while True:
+                # Check if any modal is present
+                self.is_modal_present()
 
-            # Check hibernation
-            if self.in_hibernation:
-                print('Retrying 12 hours')
-                sleep(10) # 43220 = 12hours 20segs
-                while self.is_out_of_likes_modal_present():
-                    print('Retrying 15 minutes')
-                    sleep(5) # 900 = 15mins
-                self.in_hibernation = False
+                # Check hibernation
+                if self.in_hibernation:
+                    logging.info('Retrying in hibernation mode for 12 hours')
+                    sleep(43220) # 43220 = 12hours 20segs
+                    while self.is_out_of_likes_modal_present():
+                        logging.info('Retrying in hibernation mode for 15 minutes')
+                        sleep(900) # 900 = 15mins
+                    logging.info('The bot has come out of hibernation mode')
+                    self.in_hibernation = False
                 
-            # Browse photos
-            self.browse_photos()
+                # Browse photos
+                self.browse_photos()
 
-            # Probability of like
-            if random() < settings.LIKE_PROBABILITY:
-                # Like
-                self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_RIGHT)
-            else:
-                # Dislike
-                self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_LEFT)
+                # Probability of like
+                if random() < settings.LIKE_PROBABILITY:
+                    # Like
+                    self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_RIGHT)
+                else:
+                    # Dislike
+                    self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_LEFT)
+        except Exception as e:
+            logging.error(f"Error during giving likes: {str(e)}")
+            self.close()
 
     def is_modal_present(self):
         modal_xpaths = [
             settings.XPATH_TINDER_IGNORE_ADD_TO_DESKTOP_BUTTON,
             settings.XPATH_TINDER_IGNORE_BUY_PREMIUM_BUTTON,
             settings.XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON,
+            settings.XPATH_TINDER_IGNORE_NOTIFICATIONS_BUTTON,
             settings.XPATH_TINDER_IGNORE_MATCH_BUTTON,
         ]
 
@@ -121,7 +154,7 @@ class TinderBot:
             sleep(0.15)
             if self.is_element_present(self.driver, By.XPATH, xpath):
                 if xpath == settings.XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON:
-                    print("Detected limited likes modal. Entering hibernation...")
+                    logging.info("Detected limited likes modal. Entering hibernation...")
                     self.in_hibernation = True
 
                 element_button = self.driver.find_element(By.XPATH, xpath)
@@ -148,4 +181,5 @@ class TinderBot:
             sleep(0.5)
 
     def close(self):
+        logging.info("Closing the bot...")
         self.driver.quit()
