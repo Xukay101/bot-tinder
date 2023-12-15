@@ -12,6 +12,7 @@ from selenium.common.exceptions import TimeoutException
 
 from config import settings
 from logger_config import configure_logging
+from utils import get_memory_usage
 
 configure_logging()
 
@@ -30,6 +31,9 @@ class TinderBot:
         self.driver.get(self.tinder_url)
         self.allow_location()
         self.login()
+
+        memory_usage = get_memory_usage()
+        logging.info(f'Current RAM usage for this instance: {memory_usage} MB')
 
         if settings.TEST_MODE:
             sleep(3000)
@@ -53,15 +57,15 @@ class TinderBot:
 
     def login(self):
         try:
-            logging.info("Logging into Tinder...")
+            logging.info('Logging into Tinder...')
 
             tinder_login_button = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_TINDER_LOGIN_BUTTON)
             tinder_login_button.click()
-            logging.info("Clicked Tinder login button")
+            logging.info('Clicked Tinder login button')
 
             google_login_button = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_GOOGLE_LOGIN_BUTTON)
             google_login_button.click()
-            logging.info("Clicked Google login button")
+            logging.info('Clicked Google login button')
 
             # Handle google login window
             sleep(3)
@@ -72,41 +76,42 @@ class TinderBot:
                     login_page = handle
                     break
             else:
-                raise Exception("Google login window not found")
+                raise Exception('Google login window not found')
 
+            sleep(3)
             # Enter data in inputs
             email_input = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_GOOGLE_EMAIL_INPUT)
             email_input.send_keys(settings.GOOGLE_EMAIL)
             email_input.send_keys(Keys.ENTER)
-            logging.info("Entered Google email")
+            logging.info('Entered Google email')
 
             password_input = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_GOOGLE_PASSWORD_INPUT)
             password_input.send_keys(settings.GOOGLE_PASSWORD)
             password_input.send_keys(Keys.ENTER)
-            logging.info("Entered Google password")
+            logging.info('Entered Google password')
 
             sleep(10)
             self.driver.switch_to.window(main_page)
             sleep(20) # [Important] These seconds are to load the main tinder page
 
         except Exception as e:
-            logging.error(f"Error during login: {str(e)}")
+            logging.error(f'Error during login: {str(e)}')
             self.close()
                 
     def allow_location(self):
         self.driver.execute_cdp_cmd(
-            "Browser.grantPermissions",
+            'Browser.grantPermissions',
             {
-                "origin": self.tinder_url,
-                "permissions": ["geolocation"],
+                'origin': self.tinder_url,
+                'permissions': ['geolocation'],
             },
         )
         self.driver.execute_cdp_cmd(
-            "Emulation.setGeolocationOverride",
+            'Emulation.setGeolocationOverride',
             {
-                "latitude": settings.LATITUDE,
-                "longitude": settings.LONGITUDE,
-                "accuracy": 100,
+                'latitude': settings.LATITUDE,
+                'longitude': settings.LONGITUDE,
+                'accuracy': 100,
             },
         )
 
@@ -138,7 +143,7 @@ class TinderBot:
                     # Dislike
                     self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_LEFT)
         except Exception as e:
-            logging.error(f"Error during giving likes: {str(e)}")
+            logging.error(f'Error during giving likes: {str(e)}')
             self.close()
 
     def is_modal_present(self):
@@ -154,7 +159,7 @@ class TinderBot:
             sleep(0.15)
             if self.is_element_present(self.driver, By.XPATH, xpath):
                 if xpath == settings.XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON:
-                    logging.info("Detected limited likes modal. Entering hibernation...")
+                    logging.info('Detected limited likes modal. Entering hibernation...')
                     self.in_hibernation = True
 
                 element_button = self.driver.find_element(By.XPATH, xpath)
@@ -181,5 +186,5 @@ class TinderBot:
             sleep(0.5)
 
     def close(self):
-        logging.info("Closing the bot...")
+        logging.info('Closing the bot...')
         self.driver.quit()

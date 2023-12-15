@@ -24,14 +24,14 @@ class Settings(BaseSettings):
     # XPath configurations
     XPATH_GOOGLE_LOGIN_BUTTON: str = '//*[@id="u-837590668"]' # Iframe grandfather   
     XPATH_GOOGLE_EMAIL_INPUT: str = '//*[@id="identifierId"]'
-    XPATH_GOOGLE_PASSWORD_INPUT: str = '//*[@id="password"]/div[1]/div/div[1]/input'
+    XPATH_GOOGLE_PASSWORD_INPUT: str = '//*[@id="password"]/div[1]/div/div[1]/input' # '//input[@type="password"]' 
     XPATH_TINDER_LOGIN_BUTTON: str = '//*[@id="u-1919424827"]/div/div[1]/div/main/div[1]/div/div/div/div/header/div/div[2]/div[2]/a'
     XPATH_TINDER_PHOTOS_CONTAINER: str = '//*[@id="u-1919424827"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[1]/div[1]'
     # -- Modals
     XPATH_TINDER_IGNORE_MATCH_BUTTON: str = '//*[@id="o-1843744223"]/main/div/div[1]/div/div[4]/button'
     XPATH_TINDER_IGNORE_ADD_TO_DESKTOP_BUTTON: str = '//*[@id="u647161393"]/main/div[1]/div[2]/button[1]'
     XPATH_TINDER_IGNORE_BUY_PREMIUM_BUTTON: str = '//*[@id="u647161393"]/main/div[1]/div/div[3]/button[2]'
-    XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON: str = '//*[@id="o392470796"]/main/div/div[2]/button'
+    XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON: str = '//*[@id="u647161393"]/main/div/div[2]/button'
     XPATH_TINDER_IGNORE_NOTIFICATIONS_BUTTON: str = '//*[@id="u647161393"]/main/div[1]/div/div/div[3]/button[2]'
 
 settings = Settings()
