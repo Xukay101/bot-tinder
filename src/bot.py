@@ -29,6 +29,7 @@ class TinderBot:
 
     def start(self):
         self.driver.get(self.tinder_url)
+        sleep(10)
         self.allow_location()
         self.login()
 
