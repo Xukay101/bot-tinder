@@ -92,7 +92,7 @@ class TinderBot:
 
             sleep(10)
             self.driver.switch_to.window(main_page)
-            sleep(20) # [Important] These seconds are to load the main tinder page
+            sleep(5) # [Important] These seconds are to load the main tinder page
 
         except Exception as e:
             logging.error(f'Error during login: {str(e)}')
@@ -153,6 +153,7 @@ class TinderBot:
             settings.XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON,
             settings.XPATH_TINDER_IGNORE_NOTIFICATIONS_BUTTON,
             settings.XPATH_TINDER_IGNORE_MATCH_BUTTON,
+            settings.XPATH_TINDER_IGNORE_OFFER_BUTTON,
         ]
 
         for xpath in modal_xpaths:
