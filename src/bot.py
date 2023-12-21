@@ -1,7 +1,7 @@
 import logging, sys
 from time import sleep
 from datetime import datetime, timedelta
-from random import random, randint
+from random import random, randint, choice
 
 import undetected_chromedriver as uc
 from selenium.webdriver.support import expected_conditions as EC
@@ -26,6 +26,22 @@ class TinderBot:
         self.tinder_url = settings.TINDER_URL
 
         self.in_hibernation = False
+
+        self.messages = self.load_messages()
+
+    def load_messages(self):
+        try:
+            with open('messages.txt', 'r', encoding='utf-8') as file:
+                messages = [line.strip() for line in file]
+            
+            if not messages:
+                raise ValueError('The messages file is empty.')
+
+            return messages
+        except FileNotFoundError:
+            raise FileNotFoundError('The file was not found: message.txt')
+        except Exception as e:
+            raise Exception(f'Error loading messages: {str(e)}')
 
     def start(self):
         self.driver.get(self.tinder_url)
@@ -140,6 +156,7 @@ class TinderBot:
                 if random() < settings.LIKE_PROBABILITY:
                     # Like
                     self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_RIGHT)
+                    self.is_match()
                 else:
                     # Dislike
                     self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_LEFT)
@@ -153,8 +170,8 @@ class TinderBot:
             settings.XPATH_TINDER_IGNORE_BUY_PREMIUM_BUTTON,
             settings.XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON,
             settings.XPATH_TINDER_IGNORE_NOTIFICATIONS_BUTTON,
-            settings.XPATH_TINDER_IGNORE_MATCH_BUTTON,
             settings.XPATH_TINDER_IGNORE_OFFER_BUTTON,
+            settings.XPATH_TINDER_IGNORE_OFFER_2_BUTTON,
         ]
 
         for xpath in modal_xpaths:
@@ -167,9 +184,29 @@ class TinderBot:
                 element_button = self.driver.find_element(By.XPATH, xpath)
                 element_button.click()
 
+    def is_match(self):
+        xpath = settings.XPATH_TINDER_MATCH_BUTTON
+
+        if self.is_element_present(self.driver, By.XPATH, xpath, 0.15):
+            message_input = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_TINDER_MESSAGE_INPUT)
+
+            # Get random message
+            message_string = choice(self.messages)
+
+            # Write message in input box
+            message_input.send_keys(message_string)
+
+            # Send message
+            message_input.send_keys(Keys.ENTER)
+
+            # Close message window
+            close_button = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_TINDER_MESSAGE_CLOSE)
+            close_button.click()
+            sleep(2)
+
     def is_out_of_likes_modal_present(self):
         xpath = settings.XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON
-        self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_RIGHT)
+        # self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.ARROW_RIGHT)
 
         sleep(0.2)
         if self.is_element_present(self.driver, By.XPATH, xpath):

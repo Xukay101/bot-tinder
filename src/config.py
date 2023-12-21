@@ -17,9 +17,9 @@ class Settings(BaseSettings):
     GOOGLE_PASSWORD: str # Get of the .env
     LIKE_PROBABILITY: float = 0.8
 
-    # Location // default in Buenos Aires
-    LATITUDE: float = -34.603722
-    LONGITUDE: float = -58.381592
+    # Location
+    LATITUDE: float = 40.71427
+    LONGITUDE: float = -74.00597
 
     # XPath configurations
     XPATH_GOOGLE_LOGIN_BUTTON: str = '//*[@id="u-837590668"]' # Iframe grandfather   
@@ -30,13 +30,17 @@ class Settings(BaseSettings):
     
     XPATH_TINDER_LOGIN_BUTTON: str = '//*[@id="u-1919424827"]/div/div[1]/div/main/div[1]/div/div/div/div/header/div/div[2]/div[2]/a'
     XPATH_TINDER_PHOTOS_CONTAINER: str = '//*[@id="u-1919424827"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[1]/div[1]'
+
+    XPATH_TINDER_MESSAGE_INPUT: str = '//*[@id="u1084414182"]'
+    XPATH_TINDER_MESSAGE_CLOSE: str = '//*[@id="u-1919424827"]/div/div[1]/div/main/div[1]/div/div/div/div[1]/div/div/div[1]/a/button'
     
     # -- Modals
-    XPATH_TINDER_IGNORE_MATCH_BUTTON: str = '//*[@id="o-1843744223"]/main/div/div[1]/div/div[4]/button'
+    XPATH_TINDER_MATCH_BUTTON: str = '//*[@id="o-1843744223"]/main/div/div[1]/div/div[4]/button'
     XPATH_TINDER_IGNORE_ADD_TO_DESKTOP_BUTTON: str = '//*[@id="u647161393"]/main/div[1]/div[2]/button[1]'
     XPATH_TINDER_IGNORE_BUY_PREMIUM_BUTTON: str = '//*[@id="u647161393"]/main/div[1]/div/div[3]/button[2]'
     XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON: str = '//*[@id="u647161393"]/main/div/div[2]/button'
     XPATH_TINDER_IGNORE_NOTIFICATIONS_BUTTON: str = '//*[@id="u647161393"]/main/div[1]/div/div/div[3]/button[2]'
     XPATH_TINDER_IGNORE_OFFER_BUTTON: str = '//*[@id="u647161393"]/main/div[1]/div[1]/div[4]/button[1]'
+    XPATH_TINDER_IGNORE_OFFER_2_BUTTON: str = '//*[@id="u647161393"]/main/div/div[1]/div[2]/button[2]'
 
 settings = Settings()
