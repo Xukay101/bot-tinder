@@ -185,10 +185,10 @@ class TinderBot:
                 element_button.click()
 
     def is_match(self):
-        xpath = settings.XPATH_TINDER_MATCH_BUTTON
+        xpath = settings.XPATH_TINDER_MESSAGE_INPUT
 
-        if self.is_element_present(self.driver, By.XPATH, xpath, 0.15):
-            message_input = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_TINDER_MESSAGE_INPUT)
+        if self.is_element_present(self.driver, By.XPATH, xpath, 0.20):
+            message_input = self.wait_for_element(self.driver, By.XPATH, xpath)
 
             # Get random message
             message_string = choice(self.messages)
@@ -198,11 +198,7 @@ class TinderBot:
 
             # Send message
             message_input.send_keys(Keys.ENTER)
-
-            # Close message window
-            close_button = self.wait_for_element(self.driver, By.XPATH, settings.XPATH_TINDER_MESSAGE_CLOSE)
-            close_button.click()
-            sleep(2)
+            sleep(1)
 
     def is_out_of_likes_modal_present(self):
         xpath = settings.XPATH_TINDER_IGNORE_LIMITED_LIKES_BUTTON
