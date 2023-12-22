@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 
     HEADLESS: bool = False 
     TEST_MODE: bool = False # For check xpaths
-    DRIVER_PATH: str = ''
+    DRIVER_PATH: str = './chromedriver.exe'
     TINDER_URL: str  = 'https://tinder.com'    
     GOOGLE_EMAIL: str # Get of the .env
     GOOGLE_PASSWORD: str # Get of the .env
