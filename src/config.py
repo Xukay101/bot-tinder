@@ -12,10 +12,11 @@ class Settings(BaseSettings):
 
     HEADLESS: bool = False 
     TEST_MODE: bool = False # For check xpaths
+    DRIVER_PATH: str = ''
     TINDER_URL: str  = 'https://tinder.com'    
     GOOGLE_EMAIL: str # Get of the .env
     GOOGLE_PASSWORD: str # Get of the .env
-    LIKE_PROBABILITY: float = 0.8
+    LIKE_PROBABILITY: float = 0.6
 
     # Location
     LATITUDE: float = 40.71427
@@ -32,6 +33,8 @@ class Settings(BaseSettings):
     XPATH_TINDER_PHOTOS_CONTAINER: str = '//*[@id="u-1919424827"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[1]/div[1]'
 
     XPATH_TINDER_MESSAGE_INPUT: str = '//*[@id="u1084414182"]'
+    XPATH_TINDER_MESSAGE_CLOSE: str = '//*[@id="u-1919424827"]/div/div[1]/div/main/div[1]/div/div/div/div[1]/div/div/div[1]/a/button'    
+
     # -- Modals
     XPATH_TINDER_IGNORE_ADD_TO_DESKTOP_BUTTON: str = '//*[@id="u647161393"]/main/div[1]/div[2]/button[1]'
     XPATH_TINDER_IGNORE_BUY_PREMIUM_BUTTON: str = '//*[@id="u647161393"]/main/div[1]/div/div[3]/button[2]'
@@ -39,5 +42,6 @@ class Settings(BaseSettings):
     XPATH_TINDER_IGNORE_NOTIFICATIONS_BUTTON: str = '//*[@id="u647161393"]/main/div[1]/div/div/div[3]/button[2]'
     XPATH_TINDER_IGNORE_OFFER_BUTTON: str = '//*[@id="u647161393"]/main/div[1]/div[1]/div[4]/button[1]'
     XPATH_TINDER_IGNORE_OFFER_2_BUTTON: str = '//*[@id="u647161393"]/main/div/div[1]/div[2]/button[2]'
+    XPATH_TINDER_IGNORE_OFFER_3_BUTTON: str = '//*[@id="u-1919424827"]/div/div[1]/div/main/div[1]/div/button'
 
 settings = Settings()

@@ -1,3 +1,4 @@
+import platform
 import logging, sys
 from time import sleep
 from datetime import datetime, timedelta
@@ -22,7 +23,16 @@ class TinderBot:
         options = uc.ChromeOptions()
         if settings.HEADLESS: options.add_argument('--headless')
 
-        self.driver = uc.Chrome(use_subprocess=True, options=options)
+        os = platform.system()
+        if os == 'Windows':
+            self.driver = uc.Chrome(
+                driver_executable_path=settings.DRIVER_PATH,
+                use_subprocess=True,
+                options=options
+            )
+        elif os == 'Linux':
+            self.driver = uc.Chrome(use_subprocess=True, options=options)
+            
         self.tinder_url = settings.TINDER_URL
 
         self.in_hibernation = False
@@ -45,7 +55,7 @@ class TinderBot:
 
     def start(self):
         self.driver.get(self.tinder_url)
-        sleep(10)
+        sleep(5)
         self.allow_location()
         self.login()
 
@@ -138,6 +148,7 @@ class TinderBot:
             while True:
                 # Check if any modal is present
                 self.is_modal_present()
+                sleep(1)
 
                 # Check hibernation
                 if self.in_hibernation:
@@ -172,6 +183,7 @@ class TinderBot:
             settings.XPATH_TINDER_IGNORE_NOTIFICATIONS_BUTTON,
             settings.XPATH_TINDER_IGNORE_OFFER_BUTTON,
             settings.XPATH_TINDER_IGNORE_OFFER_2_BUTTON,
+            settings.XPATH_TINDER_IGNORE_OFFER_3_BUTTON,
         ]
 
         for xpath in modal_xpaths:

@@ -36,7 +36,8 @@ cd bot-tinder
 ```bash
 pip install -r requirements.txt
 ```
-3. Configura el archivo config.py en el directorio src con tu información de cuenta y preferencias.
+3. Configura el archivo config.py en el directorio src con tu información de cuenta y preferencias. Si se esta utilizando en un sistema windows sera necesario modificar el `DRIVER_PATH` hacia donde se encuentre.
+Para descargar el driver entrar en [link](https://googlechromelabs.github.io/chrome-for-testing/)
 4. Ejecuta el bot:
 ```bash
 python src/main.py
@@ -44,7 +45,10 @@ python src/main.py
 
 ## Credenciales y Configuración
 
-Guarda tus credenciales de cuenta de Google y contraseña de Google en un archivo .env en el directorio raíz del proyecto. Debes seguir el formato del archivo .env.example.
+Se guardan las credenciales de cuenta de Google y contraseña de Google en un archivo .env en el directorio raíz del proyecto. Debes seguir el formato del archivo .env.example.
+```bash
+cp .env.example .env
+```
 
 ## Resolución de XPaths
 
