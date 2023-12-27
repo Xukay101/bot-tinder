@@ -228,6 +228,9 @@ class TinderBot:
         sleep(1) # [Important] Wait for all the photos to load
         number_of_photos = len(photos_container.find_elements(By.TAG_NAME, 'span'))
 
+        if number_of_photos in (0, 1):
+            return
+
         for _ in range(randint(1, number_of_photos-1)):
             self.driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.SPACE)
             sleep(0.5)
